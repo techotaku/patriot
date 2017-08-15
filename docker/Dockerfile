@@ -36,4 +36,4 @@ RUN apk add --no-cache bash curl nano ca-certificates python py-pip && \
     rm -rf $OC_FILE && \
     cd / && \
     rm -rf /src && \
-    apk del .ocserv-build-dependencies && \
+    apk del .ocserv-build-dependencies
