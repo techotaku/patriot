@@ -1,0 +1,22 @@
+{
+    "server": "127.0.0.1",
+
+    "additional_ports" :
+    {
+        "{{SSR_INTERNAL_PORT}}": {
+            "passwd": "{{SSR_SINGLE_PORT_PWD}}",
+            "method": "{{SSR_METHOD}}",
+            "protocol": "{{SSR_PROTOCOL}}",
+            "protocol_param": "#",
+            "obfs": "{{SSR_OBFS}}",
+            "obfs_param": ""
+        }
+    },
+    "additional_ports_only" : true,
+    "timeout": 120,
+    "udp_timeout": 60,
+    "dns_ipv6": false,
+    "connect_verbose_info": 0,
+    "redirect" : ["*:{{SSR_INTERNAL_PORT}}#127.0.0.1:{{NGINX_HTTPS_INTERNAL_PORT}}"],
+    "fast_open": true
+}

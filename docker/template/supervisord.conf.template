@@ -1,0 +1,44 @@
+[supervisord]
+loglevel=info
+nodaemon=true
+stdout_logfile=/dev/fd/1
+stdout_logfile_maxbytes=0
+redirect_stderr=true
+
+[eventlistener:stdout]
+command = supervisor_stdout
+buffer_size = 100
+events = PROCESS_LOG
+result_handler = supervisor_stdout:event_handler
+
+{{#DASHBOARD_PORT}}
+[inet_http_server]
+port=0.0.0.0:{{DASHBOARD_PORT}}
+username={{DASHBOARD_USER}}
+password={{DASHBOARD_PWD}}
+{{/DASHBOARD_PORT}}
+
+[program:haproxy]
+stdout_events_enabled = true
+stderr_events_enabled = true
+command=haproxy -f /etc/haproxy/haproxy.cfg
+
+[program:shadowsocksr]
+stdout_events_enabled = true
+stderr_events_enabled = true
+directory=/opt/shadowsocksr
+command=python server.py
+
+{{#V2RAY_HTTP_WEBSOCKET_DOMAIN}}
+[program:v2ray-websocket]
+stdout_events_enabled = true
+stderr_events_enabled = true
+command=v2ray -config /etc/v2ray/config.websocket.json
+{{/V2RAY_HTTP_WEBSOCKET_DOMAIN}}
+
+{{#OCSERV_DOMAIN}}
+[program:ocserv]
+stdout_events_enabled = true
+stderr_events_enabled = true
+command=ocserv -c /etc/ocserv/ocserv.conf -f -d 1
+{{/OCSERV_DOMAIN}}

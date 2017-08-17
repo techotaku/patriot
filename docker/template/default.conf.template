@@ -1,0 +1,55 @@
+{{#NHINX_RESOLVER}}
+    resolver {{NHINX_RESOLVER}};
+{{/NHINX_RESOLVER}}
+
+    ssl_dhparam /etc/patriot/ssl/dh2048.pem;
+
+    server {
+        listen 127.0.0.1:{{NGINX_HTTPS_INTERNAL_PORT}} ssl proxy_protocol;
+        server_name {{V2RAY_HTTP_WEBSOCKET_DOMAIN}};
+
+        ssl_certificate /etc/patriot/ssl/v2ray.ws.crt.pem;
+        ssl_certificate_key /etc/patriot/ssl/v2ray.ws.key.pem;
+
+        {{#NHINX_SSL_STAPLING}}
+        ssl_stapling on;
+        ssl_stapling_verify on;
+        ssl_trusted_certificate /etc/patriot/ssl/v2ray.ws.ca.pem;
+        {{/NHINX_SSL_STAPLING}}
+
+        {{#NHINX_HSTS}}
+        add_header Strict-Transport-Security "max-age=15552000; includeSubDomains" always;
+        {{/NHINX_HSTS}}
+        
+        ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
+        ssl_prefer_server_ciphers on;
+        ssl_ciphers "EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384 EECDH+ECDSA+SHA256 EECDH+aRSA+SHA384 EECDH+aRSA+SHA256 EECDH+aRSA+RC4 EECDH EDH+aRSA RC4 !aNULL !eNULL !LOW !3DES !MD5 !EXP !PSK !SRP !DSS !RC4";
+        
+        set_real_ip_from 127.0.0.1/32;
+        real_ip_header proxy_protocol;
+
+        {{#V2RAY_HTTP_WEBSOCKET_PATH}}
+        location /{{V2RAY_HTTP_WEBSOCKET_PATH}}/ {
+        {{/V2RAY_HTTP_WEBSOCKET_PATH}}
+        {{^V2RAY_HTTP_WEBSOCKET_PATH}}
+        location / {
+        {{/V2RAY_HTTP_WEBSOCKET_PATH}}
+
+            proxy_redirect off;
+            proxy_pass http://127.0.0.1:{{V2RAY_HTTP_INTERNAL_PORT}};
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $proxy_protocol_addr;
+            proxy_set_header X-Forwarded-For $proxy_protocol_addr;
+        }
+
+        {{#V2RAY_HTTP_WEBSOCKET_PATH}}
+        location / {
+          return 301 {{NGINX_HTTPS_REDIRECT}}$request_uri;
+        }
+        {{/V2RAY_HTTP_WEBSOCKET_PATH}}
+    }
+
+    include /etc/patriot/nginx/*.conf;

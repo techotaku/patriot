@@ -1,0 +1,32 @@
+{
+  "log" : {
+    "access": "/dev/stdout",
+    "error": "/dev/stderr",
+    "loglevel": "warning"
+  },
+  "inbound": {
+    "port": {{V2RAY_HTTP_INTERNAL_PORT}},
+    "protocol": "vmess",
+    "settings": {
+      "clients": [
+{{V2RAY_CLIENTS}}
+      ]
+    },
+    "streamSettings": {
+      "network": "ws",
+      "wsSettings": {
+        "connectionReuse": true,
+{{^V2RAY_HTTP_WEBSOCKET_PATH}}
+        "path": ""
+{{/V2RAY_HTTP_WEBSOCKET_PATH}}
+{{#V2RAY_HTTP_WEBSOCKET_PATH}}
+        "path": "/api/"
+{{/V2RAY_HTTP_WEBSOCKET_PATH}}
+      }
+    }
+  },
+  "outbound": {
+    "protocol": "freedom",
+    "settings": {}
+  }
+}
