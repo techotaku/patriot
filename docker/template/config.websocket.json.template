@@ -20,7 +20,7 @@
         "path": ""
 {{/V2RAY_HTTP_WEBSOCKET_PATH}}
 {{#V2RAY_HTTP_WEBSOCKET_PATH}}
-        "path": "/api/"
+        "path": "/{{V2RAY_HTTP_WEBSOCKET_PATH}}/"
 {{/V2RAY_HTTP_WEBSOCKET_PATH}}
       }
     }

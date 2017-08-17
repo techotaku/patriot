@@ -1,25 +1,28 @@
-{{#NHINX_RESOLVER}}
-    resolver {{NHINX_RESOLVER}};
-{{/NHINX_RESOLVER}}
+{{#NGINX_RESOLVER}}
+    resolver {{NGINX_RESOLVER}};
+{{/NGINX_RESOLVER}}
 
     ssl_dhparam /etc/patriot/ssl/dh2048.pem;
 
     server {
-        listen 127.0.0.1:{{NGINX_HTTPS_INTERNAL_PORT}} ssl proxy_protocol;
+        listen {{NGINX_HTTPS_INTERNAL_PORT}} ssl proxy_protocol;
         server_name {{V2RAY_HTTP_WEBSOCKET_DOMAIN}};
 
         ssl_certificate /etc/patriot/ssl/v2ray.ws.crt.pem;
         ssl_certificate_key /etc/patriot/ssl/v2ray.ws.key.pem;
 
-        {{#NHINX_SSL_STAPLING}}
+        error_log /dev/stdout warn;
+        access_log /dev/stdout;
+
+        {{#NGINX_SSL_STAPLING}}
         ssl_stapling on;
         ssl_stapling_verify on;
         ssl_trusted_certificate /etc/patriot/ssl/v2ray.ws.ca.pem;
-        {{/NHINX_SSL_STAPLING}}
+        {{/NGINX_SSL_STAPLING}}
 
-        {{#NHINX_HSTS}}
+        {{#NGINX_HSTS}}
         add_header Strict-Transport-Security "max-age=15552000; includeSubDomains" always;
-        {{/NHINX_HSTS}}
+        {{/NGINX_HSTS}}
         
         ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
         ssl_prefer_server_ciphers on;
@@ -28,13 +31,13 @@
         set_real_ip_from 127.0.0.1/32;
         real_ip_header proxy_protocol;
 
-        {{#V2RAY_HTTP_WEBSOCKET_PATH}}
+{{#V2RAY_HTTP_WEBSOCKET_PATH}}
         location /{{V2RAY_HTTP_WEBSOCKET_PATH}}/ {
-        {{/V2RAY_HTTP_WEBSOCKET_PATH}}
-        {{^V2RAY_HTTP_WEBSOCKET_PATH}}
+{{/V2RAY_HTTP_WEBSOCKET_PATH}}
+{{^V2RAY_HTTP_WEBSOCKET_PATH}}
         location / {
-        {{/V2RAY_HTTP_WEBSOCKET_PATH}}
-
+{{/V2RAY_HTTP_WEBSOCKET_PATH}}
+            port_in_redirect off;
             proxy_redirect off;
             proxy_pass http://127.0.0.1:{{V2RAY_HTTP_INTERNAL_PORT}};
             proxy_http_version 1.1;

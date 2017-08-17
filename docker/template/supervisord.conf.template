@@ -36,6 +36,11 @@ directory=/opt/shadowsocksr
 command=python server.py
 
 {{#V2RAY_HTTP_WEBSOCKET_DOMAIN}}
+[program:nginx]
+stdout_events_enabled = true
+stderr_events_enabled = true
+command=nginx -g "daemon off;"
+
 [program:v2ray-websocket]
 stdout_events_enabled = true
 stderr_events_enabled = true

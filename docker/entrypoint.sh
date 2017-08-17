@@ -7,6 +7,7 @@ fi
 mkdir -p /etc/patriot/ca
 mkdir -p /etc/patriot/ssl
 mkdir -p /etc/patriot/nginx
+mkdir -p /run/nginx
 
 # Internal ports
 
@@ -42,12 +43,8 @@ fi
 
 # Nginx
 
-if [ ! -z "$NHINX_RESOLVER" ] && [ -z "$NHINX_SSL_STAPLING" -a -f "/etc/patriot/ssl/v2ray.ws.ca.pem" ]; then
-    export NHINX_SSL_STAPLING=On
-fi
-
-if [ -z "$NGINX_HTTPS_DOMAINS" ]; then
-    export NGINX_HTTPS_DOMAINS=www.bing.com
+if [ ! -z "$NGINX_RESOLVER" ] && [ -z "$NGINX_SSL_STAPLING" -a -f "/etc/patriot/ssl/v2ray.ws.ca.pem" ]; then
+    export NGINX_SSL_STAPLING=On
 fi
 
 if [ -z "$NGINX_HTTPS_REDIRECT" ]; then

@@ -6,6 +6,7 @@ ARG V2RAY_VER=2.34
 ARG OC_VERSION=0.11.8
 
 RUN apk add --no-cache bash curl nano ca-certificates python py-pip nginx haproxy gnutls gnutls-utils && \
+    sed -i "/error_log /{s/\/var\/log\/nginx\/error.log/\/dev\/stdout/}" /etc/nginx/nginx.conf && \
     apk add --no-cache --virtual .ocserv-runtime-dependencies iptables musl openssl readline libnl3 lz4 lz4-libs libseccomp libev geoip && \
     apk add --no-cache --virtual .ocserv-build-dependencies build-base unzip xz linux-headers musl-dev gnutls-dev readline-dev libnl3-dev lz4-dev libseccomp-dev libev-dev geoip-dev && \
     pip install supervisor supervisor-stdout && \
