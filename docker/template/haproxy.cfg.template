@@ -3,6 +3,9 @@ defaults
     timeout client 24h
     timeout server 24h
 
+global
+    log /dev/log local0
+   
 frontend ssl
     mode tcp
     option tcplog

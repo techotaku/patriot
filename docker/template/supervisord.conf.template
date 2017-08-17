@@ -18,6 +18,12 @@ username={{DASHBOARD_USER}}
 password={{DASHBOARD_PWD}}
 {{/DASHBOARD_PORT}}
 
+[program:syslogd]
+priority=1
+stdout_events_enabled = true
+stderr_events_enabled = true
+command=/sbin/syslogd -n -O -
+
 [program:haproxy]
 stdout_events_enabled = true
 stderr_events_enabled = true
