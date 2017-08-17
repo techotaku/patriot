@@ -7,6 +7,7 @@ global
     log /dev/log local0
    
 frontend ssl
+    log global
     mode tcp
     option tcplog
     option dontlognull
