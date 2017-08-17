@@ -129,8 +129,6 @@ if [ -z "$SSR_DB_SSL" ]; then
     export SSR_DB_SSL=0
 fi
 
-#export
-
 echo ""
 echo "Updating userapiconfig.py..."
 cat /etc/patriot/template/userapiconfig.py.template | mo > /opt/shadowsocksr/userapiconfig.py
