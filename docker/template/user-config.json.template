@@ -1,6 +1,9 @@
 {
     "server": "127.0.0.1",
+    "password": "meaningless",
+    "server_port": {{SSR_INTERNAL_PORT}},
 
+{{^SSR_SINGLE_USER}}
     "additional_ports" :
     {
         "{{SSR_INTERNAL_PORT}}": {
@@ -13,6 +16,7 @@
         }
     },
     "additional_ports_only" : true,
+{{/SSR_SINGLE_USER}}
     "timeout": 120,
     "udp_timeout": 60,
     "dns_ipv6": false,

@@ -10,7 +10,7 @@
         "port": {{SSR_INTERNAL_PORT}},
         "transfer_enable": 1125899906842624,
         "u": 0,
-        "user": "443"
+        "user": "{{SSR_INTERNAL_PORT}}"
     },
     {
         "d": 0,
@@ -18,7 +18,6 @@
         "passwd": "{{SSR_SINGLE_PORT_PWD}}",
         "method": "{{SSR_METHOD}}",
         "protocol": "{{SSR_PROTOCOL}}",
-        "protocol_param": "#",
         "obfs": "{{SSR_OBFS}}",
         "port": {{SSR_SINGLE_USER_ID}},
         "transfer_enable": 1125899906842624,
