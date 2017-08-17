@@ -19,6 +19,7 @@ RUN apk add --no-cache bash curl nano ca-certificates python py-pip nginx haprox
     rm -rf /tmp/v2ray* && \
     curl -L https://github.com/shadowsocksrr/shadowsocksr/archive/manyuser.zip -o /tmp/shadowsocksr.zip && \
     unzip /tmp/shadowsocksr.zip -d /tmp/ && \
+    mkdir -p /opt && \
     mv /tmp/shadowsocksr-manyuser /opt/shadowsocksr && \
     rm /tmp/shadowsocksr.zip && \
     mkdir /src && cd /src && \
