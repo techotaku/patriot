@@ -45,15 +45,15 @@ RUN apk add --no-cache bash curl nano ca-certificates python py-pip nginx haprox
     mv entrypoint.sh /usr/local/bin/entrypoint.sh && \
     chmod +x gencert.sh && \
     mv gencert.sh /usr/local/bin/gencert.sh && \
-    mkdir -p /etc/patriot/template && \
-    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/config.websocket.json.template -o /etc/patriot/template/config.websocket.json.template && \
-    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/default.conf.template -o /etc/patriot/template/default.conf.template && \
-    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/haproxy.cfg.template -o /etc/patriot/template/haproxy.cfg.template && \
-    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/mudb.json.template -o /etc/patriot/template/mudb.json.template && \
-    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/ocserv.conf.template -o /etc/patriot/template/ocserv.conf.template && \
-    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/supervisord.conf.template -o /etc/patriot/template/supervisord.conf.template && \
-    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/userapiconfig.py.template -o /etc/patriot/template/userapiconfig.py.template && \
-    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/user-config.json.template -o /etc/patriot/template/user-config.json.template && \
-    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/usermysql.json.template -o /etc/patriot/template/usermysql.json.template
+    mkdir -p /etc/mo/template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/config.websocket.json.template -o /etc/mo/template/config.websocket.json.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/default.conf.template -o /etc/mo/template/default.conf.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/haproxy.cfg.template -o /etc/mo/template/haproxy.cfg.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/mudb.json.template -o /etc/mo/template/mudb.json.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/ocserv.conf.template -o /etc/mo/template/ocserv.conf.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/supervisord.conf.template -o /etc/mo/template/supervisord.conf.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/userapiconfig.py.template -o /etc/mo/template/userapiconfig.py.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/user-config.json.template -o /etc/mo/template/user-config.json.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/usermysql.json.template -o /etc/mo/template/usermysql.json.template
 
 ENTRYPOINT ["entrypoint.sh"]

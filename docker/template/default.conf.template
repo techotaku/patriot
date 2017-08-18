@@ -8,8 +8,8 @@
         listen {{NGINX_HTTPS_INTERNAL_PORT}} ssl proxy_protocol;
         server_name {{V2RAY_HTTP_WEBSOCKET_DOMAIN}};
 
-        ssl_certificate /etc/patriot/ssl/v2ray.ws.crt.pem;
-        ssl_certificate_key /etc/patriot/ssl/v2ray.ws.key.pem;
+        ssl_certificate {{V2RAY_WEBSOCKET_CERT}};
+        ssl_certificate_key {{V2RAY_WEBSOCKET_KEY}};
 
         error_log /dev/stdout warn;
         access_log /dev/stdout;
@@ -17,7 +17,7 @@
         {{#NGINX_SSL_STAPLING}}
         ssl_stapling on;
         ssl_stapling_verify on;
-        ssl_trusted_certificate /etc/patriot/ssl/v2ray.ws.ca.pem;
+        ssl_trusted_certificate {{V2RAY_WEBSOCKET_CA}};
         {{/NGINX_SSL_STAPLING}}
 
         {{#NGINX_HSTS}}

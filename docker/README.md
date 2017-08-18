@@ -15,11 +15,14 @@
  * NGINX_HTTPS_REDIRECT  
    
  * V2RAY_HTTP_INTERNAL_PORT  
- * V2RAY_HTTP_WEBSOCKET_DOMAIN *required*  
+ * V2RAY_HTTP_WEBSOCKET_DOMAIN *Required if you want V2Ray (Nginx TLS + V2Ray Http WebSocket). if cert is already presented, it can be multi domains (separated by space).*  
  * V2RAY_HTTP_WEBSOCKET_PATH  
  * V2RAY_SINGLE_USER  
  * V2RAY_SINGLE_USER_UUID  
  * V2RAY_CLIENTS  
+ * V2RAY_WEBSOCKET_CERT  
+ * V2RAY_WEBSOCKET_KEY  
+ * V2RAY_WEBSOCKET_CA  
   
  * PUBLIC_IP  
  * SSR_INTERNAL_PORT  
@@ -32,6 +35,8 @@
  * SSR_PROTOCOL  
  * SSR_OBFS  
  * SSR_OBFS_DOMAIN  
+ * SSR_OBFS_DOMAIN2  
+ * SSR_OBFS_DOMAIN3   
  * SSR_DB_HOST  
  * SSR_DB_PORT  
  * SSR_DB_USER  
@@ -45,9 +50,13 @@
  * SSR_DB_SSL_KEY  
    
  * OCSERV_INTERNAL_PORT  
- * OCSERV_DOMAIN *required*  
+ * OCSERV_DOMAIN *Required if you want Open Connect. If cert is already presented, it can be any non-empty value.*  
  * OCSERV_BANNER  
  * OCSERV_DNS  
  * OCSERV_SUBNET  
  * OCSERV_NETMASK  
+ * OCSERV_CERT  
+ * OCSERV_KEY  
+ * OCSERV_CA  
+ 
  
