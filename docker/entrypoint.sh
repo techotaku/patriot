@@ -9,6 +9,10 @@ mkdir -p /etc/patriot/ssl
 mkdir -p /etc/patriot/nginx
 mkdir -p /run/nginx
 
+if [ -d "/etc/patriot/www" ] && [ ! -d "/www" ]; then
+    ln -s /etc/patriot/www /www
+fi
+
 sysctl -p
 sysctl net.ipv4.ip_forward
 
@@ -107,16 +111,19 @@ if [ -z "$V2RAY_SINGLE_USER_ALTER_ID" ]; then
 fi
 
 if [ -z "$V2RAY_CLIENTS" ]; then
+    mkdir -p /etc/patriot/v2ray
     export V2RAY_CLIENTS=/etc/patriot/v2ray/clients.json
 fi
 
 if [ ! -f "$V2RAY_CLIENTS" ]; then
     if [ -z "$V2RAY_SINGLE_USER_UUID"]; then
         export V2RAY_SINGLE_USER_UUID=`cat /proc/sys/kernel/random/uuid`
-        echo "[Info] V2Ray - new UUID generated: ${V2RAY_SINGLE_USER_UUID}."
+        echo "[Info] V2Ray - new UUID generated: ${V2RAY_SINGLE_USER_UUID}. Saved to ${V2RAY_CLIENTS}."
     fi
     export V2RAY_SINGLE_USER=On
+    export V2RAY_CLIENTS_PATH="${V2RAY_CLIENTS}"
     export V2RAY_CLIENTS="{ \"id\": \"${V2RAY_SINGLE_USER_UUID}\", \"alterId\": ${V2RAY_SINGLE_USER_ALTER_ID}, \"level\": 1 }"
+    echo "${V2RAY_CLIENTS}" > "${V2RAY_CLIENTS_PATH}"
 else
     export V2RAY_CLIENTS=`cat "${V2RAY_CLIENTS}"`
 fi
