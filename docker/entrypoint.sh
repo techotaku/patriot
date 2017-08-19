@@ -9,10 +9,6 @@ mkdir -p /etc/patriot/ssl
 mkdir -p /etc/patriot/nginx
 mkdir -p /run/nginx
 
-if [ -d "/etc/patriot/www" ] && [ ! -d "/www" ]; then
-    ln -s /etc/patriot/www /www
-fi
-
 sysctl -p
 sysctl net.ipv4.ip_forward
 
@@ -96,12 +92,16 @@ fi
 
 # Nginx
 
+if [ -z "$NGINX_HTTPS_REDIRECT" ]; then
+    export NGINX_HTTPS_REDIRECT=https://www.bing.com
+fi
+
 if [ ! -z "$NGINX_RESOLVER" ] && [ -z "$NGINX_SSL_STAPLING" -a -f "$V2RAY_WEBSOCKET_CA" ]; then
     export NGINX_SSL_STAPLING=On
 fi
 
-if [ -z "$NGINX_HTTPS_REDIRECT" ]; then
-    export NGINX_HTTPS_REDIRECT=https://www.bing.com
+if [ -z "$NGINX_PHPFPM" ]; then
+    export NGINX_PHPFPM=php
 fi
 
 # V2Ray
@@ -205,8 +205,13 @@ fi
 echo "Updating usermysql.json..."
 cat /etc/mo/template/usermysql.json.template | mo > /opt/shadowsocksr/usermysql.json
 
-echo "Updating nginx default.conf..."
+echo "Updating nginx configurations..."
 cat /etc/mo/template/default.conf.template | mo > /etc/nginx/conf.d/default.conf
+cat /etc/mo/template/nginx.listen-ssl.template | mo > /etc/nginx/conf.d/listen-ssl
+cat /etc/mo/template/nginx.php-param.template | mo > /etc/nginx/conf.d/php-param
+cat /etc/mo/template/nginx.ssl-param.template | mo > /etc/nginx/conf.d/ssl-param
+cat /etc/mo/template/nginx.ssl-param-with-shared-ca.template | mo > /etc/nginx/conf.d/ssl-param-with-shared-ca
+cat /etc/mo/template/nginx.v2ray-websocket-param.template | mo > /etc/nginx/conf.d/v2ray-websocket-param
 
 echo "Updating v2ray config.websocket.json..."
 mkdir -p /etc/v2ray

@@ -19,10 +19,14 @@ RUN apk add --no-cache bash curl nano ca-certificates python py-pip nginx haprox
     chmod +x /usr/local/bin/v2ray && \
     rm -rf /tmp/v2ray* && \
     curl -L https://github.com/shadowsocksrr/shadowsocksr/archive/manyuser.zip -o /tmp/shadowsocksr.zip && \
+    curl -L https://github.com/nakagami/CyMySQL/archive/master.zip -o /tmp/CyMySQL.zip && \
     unzip /tmp/shadowsocksr.zip -d /tmp/ && \
+    unzip /tmp/CyMySQL.zip -d /tmp/ && \
+    mv /tmp/CyMySQL-master/cymysql /tmp/shadowsocksr-manyuser/ && \
+    rm -rf /tmp/CyMySQL-master && \
     mkdir -p /opt && \
     mv /tmp/shadowsocksr-manyuser /opt/shadowsocksr && \
-    rm /tmp/shadowsocksr.zip && \
+    rm /tmp/shadowsocksr.zip /tmp/CyMySQL.zip && \
     mkdir /src && cd /src && \
     OC_FILE="ocserv-$OC_VERSION" && \
     wget ftp://ftp.infradead.org/pub/ocserv/$OC_FILE.tar.xz && \
@@ -48,6 +52,11 @@ RUN apk add --no-cache bash curl nano ca-certificates python py-pip nginx haprox
     mkdir -p /etc/mo/template && \
     curl -L https://github.com/techotaku/patriot/raw/master/docker/template/config.websocket.json.template -o /etc/mo/template/config.websocket.json.template && \
     curl -L https://github.com/techotaku/patriot/raw/master/docker/template/default.conf.template -o /etc/mo/template/default.conf.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/nginx.listen-ssl.template -o /etc/mo/template/nginx.listen-ssl.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/nginx.php-param.template -o /etc/mo/template/nginx.php-param.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/nginx.ssl-param.template -o /etc/mo/template/nginx.ssl-param.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/nginx.ssl-param-with-shared-ca.template -o /etc/mo/template/nginx.ssl-param-with-shared-ca.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/nginx.v2ray-websocket-param.template -o /etc/mo/template/nginx.v2ray-websocket-param.template && \
     curl -L https://github.com/techotaku/patriot/raw/master/docker/template/haproxy.cfg.template -o /etc/mo/template/haproxy.cfg.template && \
     curl -L https://github.com/techotaku/patriot/raw/master/docker/template/mudb.json.template -o /etc/mo/template/mudb.json.template && \
     curl -L https://github.com/techotaku/patriot/raw/master/docker/template/ocserv.conf.template -o /etc/mo/template/ocserv.conf.template && \
