@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export PYTHONUNBUFFERED=1
+
 if [ -z "$PUBLIC_IP" ]; then
     export PUBLIC_IP=`curl -s https://ipconfig.io`
 fi
@@ -9,12 +11,18 @@ mkdir -p /etc/patriot/ssl
 mkdir -p /etc/patriot/nginx
 mkdir -p /run/nginx
 
-sysctl -p
-sysctl net.ipv4.ip_forward
+IP_FORWARD_ENABLE=`sysctl -n net.ipv4.ip_forward`
+if [ "$IP_FORWARD_ENABLE" -eq "0" ]; then
+    echo "[Error] IP forward disabled. On host, execute below commands:"
+    echo "        echo \"net.core.default_qdisc = fq\" | sudo tee -a /etc/sysctl.conf"
+    echo "        sysctl -p"
+else
+    echo "[Info] IP forward enable."
+fi
 
 # Enable NAT forwarding
-iptables -t nat -A POSTROUTING -j MASQUERADE
-iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+iptables -t nat -A POSTROUTING -j MASQUERADE || echo "No permission to operate iptables."
+iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || echo "Run container with option \"--cap-add=NET_ADMIN\"."
 
 # Enable TUN device
 if [ ! -e /dev/net/tun ]; then
@@ -191,21 +199,26 @@ if [ -z "$SSR_DB_SSL" ]; then
 fi
 
 echo ""
-echo "Updating userapiconfig.py..."
+echo "Updating ShadowsocksR configurations..."
+
+rm -f /opt/shadowsocksr/userapiconfig.py > /dev/null 2>&1
+rm -f /opt/shadowsocksr/user-config.json > /dev/null 2>&1
+rm -f /opt/shadowsocksr/usermysql.json > /dev/null 2>&1
+rm -f /opt/shadowsocksr/mudb.json > /dev/null 2>&1
+
 cat /etc/mo/template/userapiconfig.py.template | mo > /opt/shadowsocksr/userapiconfig.py
-
-echo "Updating user-config.json..."
 cat /etc/mo/template/user-config.json.template | mo > /opt/shadowsocksr/user-config.json
-
-if [ ! -z "$SSR_SINGLE_USER" ]; then
-    echo "Updating mudb.json..."
-    cat /etc/mo/template/mudb.json.template | mo > /opt/shadowsocksr/mudb.json
-fi
-
-echo "Updating usermysql.json..."
 cat /etc/mo/template/usermysql.json.template | mo > /opt/shadowsocksr/usermysql.json
 
-echo "Updating nginx configurations..."
+if [ ! -z "$SSR_SINGLE_USER" ]; then
+    cat /etc/mo/template/mudb.json.template | mo > /opt/shadowsocksr/mudb.json
+else
+    if [ -f "$SSR_MUDB_FILE" ]; then
+        ln -s "$SSR_MUDB_FILE" /opt/shadowsocksr/mudb.json
+    fi
+fi
+
+echo "Updating Nginx configurations..."
 cat /etc/mo/template/default.conf.template | mo > /etc/nginx/conf.d/default.conf
 cat /etc/mo/template/nginx.listen-ssl.template | mo > /etc/nginx/conf.d/listen-ssl
 cat /etc/mo/template/nginx.php-param.template | mo > /etc/nginx/conf.d/php-param
@@ -213,19 +226,20 @@ cat /etc/mo/template/nginx.ssl-param.template | mo > /etc/nginx/conf.d/ssl-param
 cat /etc/mo/template/nginx.ssl-param-with-shared-ca.template | mo > /etc/nginx/conf.d/ssl-param-with-shared-ca
 cat /etc/mo/template/nginx.v2ray-websocket-param.template | mo > /etc/nginx/conf.d/v2ray-websocket-param
 
-echo "Updating v2ray config.websocket.json..."
+echo "Updating V2Ray configurations..."
 mkdir -p /etc/v2ray
 cat /etc/mo/template/config.websocket.json.template | mo > /etc/v2ray/config.websocket.json
 
-echo "Updating ocserv.conf..."
+echo "Updating OCserv configuration..."
 mkdir -p /etc/ocserv
 cat /etc/mo/template/ocserv.conf.template | mo > /etc/ocserv/ocserv.conf
 
-echo "Updating haproxy.cfg..."
+echo "Updating HAProxy configuration..."
 cat /etc/mo/template/haproxy.cfg.template | mo > /etc/haproxy/haproxy.cfg
 
-echo "Updating supervisord.conf..."
+echo "Updating Supervisord configuration..."
 mkdir -p /etc/supervisord
 cat /etc/mo/template/supervisord.conf.template | mo > /etc/supervisord/supervisord.conf
 
+echo "All configurations updated. Starting services..."
 exec supervisord --nodaemon --configuration /etc/supervisord/supervisord.conf "$@"

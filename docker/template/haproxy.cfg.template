@@ -25,11 +25,14 @@ frontend ssl
     use_backend ocserv if tls !has_sni
 {{/OCSERV_DOMAIN}}
     use_backend shadowsocksr if tls { req.ssl_sni -i {{SSR_OBFS_DOMAIN}} }
+    use_backend shadowsocksr if tls { req.ssl_sni -m end .{{SSR_OBFS_DOMAIN}} }
 {{#SSR_OBFS_DOMAIN2}}
     use_backend shadowsocksr if tls { req.ssl_sni -i {{SSR_OBFS_DOMAIN2}} }
+    use_backend shadowsocksr if tls { req.ssl_sni -m end .{{SSR_OBFS_DOMAIN2}} }
 {{/SSR_OBFS_DOMAIN2}}
 {{#SSR_OBFS_DOMAIN3}}
     use_backend shadowsocksr if tls { req.ssl_sni -i {{SSR_OBFS_DOMAIN3}} }
+    use_backend shadowsocksr if tls { req.ssl_sni -m end .{{SSR_OBFS_DOMAIN3}} }
 {{/SSR_OBFS_DOMAIN3}}
 {{#V2RAY_HTTP_WEBSOCKET_DOMAIN}}
     use_backend nginx if tls has_sni
