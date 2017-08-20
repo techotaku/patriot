@@ -48,6 +48,8 @@
  * SSR_DB_SSL_CA  
  * SSR_DB_SSL_CRT  
  * SSR_DB_SSL_KEY  
+ * SSR_SINGLE_PORT_EXPOSE  
+ * SSR_SINGLE_PORT_EXPOSE_REDIRECT  
    
  * OCSERV_INTERNAL_PORT  
  * OCSERV_DOMAIN *Required if you want Open Connect. If cert is already presented, it can be any non-empty value.*  
