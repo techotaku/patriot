@@ -110,7 +110,7 @@ if [ ! -z "$NGINX_RESOLVER" ] && [ -z "$NGINX_SSL_STAPLING" -a -f "$V2RAY_WEBSOC
 fi
 
 if [ -z "$NGINX_PHPFPM" ]; then
-    export NGINX_PHPFPM=php
+    export NGINX_PHPFPM=`dig +short -t a php`
 fi
 
 # V2Ray
