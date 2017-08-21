@@ -152,6 +152,10 @@ fi
 
 # SSR
 
+if [ ! -z "$PUBLIC_IP" ] && [ -z "$SSR_DB_NODE" ] && [ -f "/etc/patriot/shadowsocksr/nodes/$PUBLIC_IP" ]; then
+    export SSR_DB_NODE=`cat "/etc/patriot/shadowsocksr/nodes/$PUBLIC_IP"`
+fi
+
 if [ -z "$SSR_API_INTERFACE" ]; then
     export SSR_SINGLE_USER=On
     export SSR_API_INTERFACE=mudbjson
