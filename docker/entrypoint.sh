@@ -5,6 +5,7 @@ export PYTHONUNBUFFERED=1
 if [ -z "$PUBLIC_IP" ]; then
     export PUBLIC_IP=`curl -s https://ipconfig.io`
 fi
+echo "[Info] Public IP ${PUBLIC_IP} detected."
 
 mkdir -p /etc/patriot/ca
 mkdir -p /etc/patriot/ssl
@@ -17,7 +18,7 @@ if [ "$IP_FORWARD_ENABLE" -eq "0" ]; then
     echo "        echo \"net.core.default_qdisc = fq\" | sudo tee -a /etc/sysctl.conf"
     echo "        sysctl -p"
 else
-    echo "[Info] IP forward enable."
+    echo "[Info] IP forward enabled."
 fi
 
 # Enable NAT forwarding
@@ -133,6 +134,7 @@ if [ ! -f "$V2RAY_CLIENTS" ]; then
     export V2RAY_CLIENTS="{ \"id\": \"${V2RAY_SINGLE_USER_UUID}\", \"alterId\": ${V2RAY_SINGLE_USER_ALTER_ID}, \"level\": 1 }"
     echo "${V2RAY_CLIENTS}" > "${V2RAY_CLIENTS_PATH}"
 else
+    echo "[Info] V2Ray predefined user configuration detected."
     export V2RAY_CLIENTS=`cat "${V2RAY_CLIENTS}"`
 fi
 
@@ -154,6 +156,7 @@ fi
 
 if [ ! -z "$PUBLIC_IP" ] && [ -z "$SSR_DB_NODE" ] && [ -f "/etc/patriot/shadowsocksr/nodes/$PUBLIC_IP" ]; then
     export SSR_DB_NODE=`cat "/etc/patriot/shadowsocksr/nodes/$PUBLIC_IP"`
+    echo "[Info] ShadowsocksR Node ID ${SSR_DB_NODE} automatically detected."
 fi
 
 if [ -z "$SSR_API_INTERFACE" ]; then
@@ -166,6 +169,7 @@ if [ -z "$SSR_SINGLE_PORT_PWD" ]; then
 fi
 
 if [ ! -z "$SSR_SINGLE_USER" ]; then
+    echo "[Info] ShadowsocksR single user mode enabled."
     if [ -z "$SSR_SINGLE_USER_ID" ]; then
         export SSR_SINGLE_USER_ID=198709
     fi
@@ -173,6 +177,8 @@ if [ ! -z "$SSR_SINGLE_USER" ]; then
         export SSR_SINGLE_USER_PWD=rEciTw
     fi
 fi
+
+echo "[Info] ShadowsocksR API interface ${SSR_API_INTERFACE} applied."
 
 if [ -z "$SSR_METHOD" ]; then
     export SSR_METHOD=none
