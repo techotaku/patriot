@@ -7,3 +7,6 @@ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubun
 sudo apt-get update
 sudo apt-get install -y docker-ce
 sudo systemctl enable docker
+
+sudo mkdir -p /etc/docker
+echo "{ \"live-restore\": true }" | sudo tee /etc/docker/daemon.json
