@@ -63,6 +63,7 @@ RUN apk add --no-cache bash curl nano ca-certificates bind-tools python py-pip n
     curl -L https://github.com/techotaku/patriot/raw/master/docker/template/supervisord.conf.template -o /etc/mo/template/supervisord.conf.template && \
     curl -L https://github.com/techotaku/patriot/raw/master/docker/template/userapiconfig.py.template -o /etc/mo/template/userapiconfig.py.template && \
     curl -L https://github.com/techotaku/patriot/raw/master/docker/template/user-config.json.template -o /etc/mo/template/user-config.json.template && \
-    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/usermysql.json.template -o /etc/mo/template/usermysql.json.template
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/usermysql.json.template -o /etc/mo/template/usermysql.json.template && \
+    curl https://get.acme.sh | sh && crontab -l | sed 's#> /dev/null##' | crontab -
 
 ENTRYPOINT ["entrypoint.sh"]
