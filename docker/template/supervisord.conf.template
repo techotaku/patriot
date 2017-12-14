@@ -29,14 +29,19 @@ stdout_events_enabled = true
 stderr_events_enabled = true
 command=haproxy -f /etc/haproxy/haproxy.cfg
 
-{{SSL_DOMAIN}}
 [program:caddy]
 stdout_events_enabled = true
 stderr_events_enabled = true
-command=caddy -agree -conf /etc/Caddyfile -disable-tls-sni-challenge -https-port {{CADDY_INTERNAL_PORT}} -log stdout
+command=caddy -agree -conf /etc/Caddyfile -disable-tls-sni-challenge -https-port {{CADDY_INTERNAL_PORT}} -log stdout -root /root/webroot
 
 [program:v2ray]
 stdout_events_enabled = true
 stderr_events_enabled = true
 command=v2ray -config /etc/v2ray/config.websocket.json
-{{/SSL_DOMAIN}}
+
+{{#OCSERV_READY}}
+[program:ocserv]
+stdout_events_enabled = true
+stderr_events_enabled = true
+command=ocserv -c /etc/ocserv/ocserv.conf -f -d 1
+{{/OCSERV_READY}}

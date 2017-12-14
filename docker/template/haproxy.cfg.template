@@ -21,6 +21,9 @@ frontend ssl
     acl has_sni req.ssl_sni -m found
     acl ssh_payload payload(0,7) -m bin 5353482d322e30
 
+{{#OCSERV_READY}}
+    use_backend ocserv if tls !has_sni
+{{/OCSERV_READY}}
     use_backend caddy if tls has_sni
     use_backend openssh if ssh_payload
     use_backend openssh if !tls { req.len 0 }
@@ -35,3 +38,9 @@ backend caddy
     mode tcp
     timeout server 5m
     server webserver localhost:{{CADDY_INTERNAL_PORT}} send-proxy
+
+{{#OCSERV_READY}}
+backend ocserv
+    mode tcp
+    server sslvpn 127.0.0.1:{{OCSERV_INTERNAL_PORT}} send-proxy-v2
+{{/OCSERV_READY}}

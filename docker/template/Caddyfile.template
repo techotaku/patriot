@@ -1,7 +1,7 @@
 https://{{SSL_DOMAIN}} {
     proxyprotocol 0.0.0.0/0
     tls {{ACME_EMAIL}}
-    proxy /api localhost:{{V2RAY_HTTP_INTERNAL_PORT}} {
+    proxy {{^V2RAY_HTTP_WEBSOCKET_PATH}}/{{/V2RAY_HTTP_WEBSOCKET_PATH}}{{#V2RAY_HTTP_WEBSOCKET_PATH}}/{{V2RAY_HTTP_WEBSOCKET_PATH}}{{/V2RAY_HTTP_WEBSOCKET_PATH}} localhost:{{V2RAY_HTTP_INTERNAL_PORT}} {
         websocket
         transparent
     }
