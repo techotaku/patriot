@@ -2,6 +2,10 @@ version: '3'
 services:
   patriot:
     image: tarot13/patriot
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
     ports:
      - "443:443"
     volumes:
@@ -9,12 +13,9 @@ services:
     cap_add:
      - NET_ADMIN
     restart: unless-stopped
-    ulimits:
-      nofile:
-        soft: 512000
-        hard: 1024000
     environment:
-     - V2RAY_HTTP_WEBSOCKET_DOMAIN=v2ray.example.xyz
-     - OCSERV_DOMAIN=cisco.example.xyz
+     - SSL_DOMAIN=example.test
+     - V2RAY_HTTP_WEBSOCKET_PATH=api
+     - ACME_EMAIL=admin@example.test
     labels:
       xyz.ianli.patriot.role: "all"
