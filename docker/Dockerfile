@@ -35,19 +35,19 @@ RUN apk add --no-cache bash curl nano ca-certificates bind-tools python py-pip h
     cd / && \
     rm -rf /src && \
     apk del .ocserv-build-dependencies && \
-    curl -L -O https://github.com/techotaku/patriot/raw/caddy/docker/entrypoint.sh && \
-    curl -L -O https://github.com/techotaku/patriot/raw/caddy/docker/gencert.sh && \
+    curl -L -O https://github.com/techotaku/patriot/raw/master/docker/entrypoint.sh && \
+    curl -L -O https://github.com/techotaku/patriot/raw/master/docker/gencert.sh && \
     chmod +x entrypoint.sh && \
     mv entrypoint.sh /usr/local/bin/entrypoint.sh && \
     chmod +x gencert.sh && \
     mv gencert.sh /usr/local/bin/gencert.sh && \
     mkdir -p /etc/mo/template && \
-    curl -L https://github.com/techotaku/patriot/raw/caddy/docker/template/Caddyfile.template -o /etc/mo/template/Caddyfile.template && \
-    curl -L https://github.com/techotaku/patriot/raw/caddy/docker/template/index.html.template -o /etc/mo/template/index.html.template && \
-    curl -L https://github.com/techotaku/patriot/raw/caddy/docker/template/config.websocket.json.template -o /etc/mo/template/config.websocket.json.template && \
-    curl -L https://github.com/techotaku/patriot/raw/caddy/docker/template/haproxy.cfg.template -o /etc/mo/template/haproxy.cfg.template && \
-    curl -L https://github.com/techotaku/patriot/raw/caddy/docker/template/ocserv.conf.template -o /etc/mo/template/ocserv.conf.template && \
-    curl -L https://github.com/techotaku/patriot/raw/caddy/docker/template/supervisord.conf.template -o /etc/mo/template/supervisord.conf.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/Caddyfile.template -o /etc/mo/template/Caddyfile.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/index.html.template -o /etc/mo/template/index.html.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/config.websocket.json.template -o /etc/mo/template/config.websocket.json.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/haproxy.cfg.template -o /etc/mo/template/haproxy.cfg.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/ocserv.conf.template -o /etc/mo/template/ocserv.conf.template && \
+    curl -L https://github.com/techotaku/patriot/raw/master/docker/template/supervisord.conf.template -o /etc/mo/template/supervisord.conf.template && \
     curl https://getcaddy.com | bash -s personal http.proxyprotocol
 
 ENTRYPOINT ["entrypoint.sh"]
