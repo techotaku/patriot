@@ -22,17 +22,6 @@ cert_signing_key
 crl_signing_key
 _EOF_
 
-cat > server.tmpl <<_EOF_
-cn = "${DOMAIN}"
-dns_name = "${DOMAIN}"
-organization = "${ORG}"
-serial = 2
-expiration_days = 3650
-encryption_key
-signing_key
-tls_www_server
-_EOF_
-
 cat > client.tmpl <<_EOF_
 cn = "${CLIENT}"
 uid = "${CLIENT}"
@@ -48,12 +37,6 @@ if [ ! -f "ca.key.pem" ]; then
     certtool --generate-self-signed --load-privkey ca.key.pem --template ca.tmpl --outfile ca.crt.pem
 fi
 
-if [ ! -f "${DOMAIN}".crt.pem ]; then
-    echo "[Info] Generating server cert for ${DOMAIN}..."
-    certtool --generate-privkey --outfile "${DOMAIN}".key.pem
-    certtool --generate-certificate --load-privkey "${DOMAIN}".key.pem --load-ca-certificate ca.crt.pem --load-ca-privkey ca.key.pem --template server.tmpl --outfile "${DOMAIN}".crt.pem
-fi
-
 if [ ! -z "$USERNAME" ] && [ ! -z "$PASSWORD" ] && [ ! -f "${CLIENT}".p12 ]; then
     echo "[Info] Generating client cert for ${CLIENT}..."
     certtool --generate-privkey --outfile "${CLIENT}".key.pem
@@ -62,7 +45,6 @@ if [ ! -z "$USERNAME" ] && [ ! -z "$PASSWORD" ] && [ ! -f "${CLIENT}".p12 ]; the
 fi
 
 rm ca.tmpl
-rm server.tmpl
 rm client.tmpl
 
 cd $OLDPWD

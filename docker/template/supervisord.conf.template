@@ -11,12 +11,12 @@ buffer_size = 100
 events = PROCESS_LOG
 result_handler = supervisor_stdout:event_handler
 
-{{#DASHBOARD_PORT}}
+{{#DASHBOARD_INTERNAL_PORT}}
 [inet_http_server]
-port=0.0.0.0:{{DASHBOARD_PORT}}
+port=0.0.0.0:{{DASHBOARD_INTERNAL_PORT}}
 username={{DASHBOARD_USER}}
 password={{DASHBOARD_PWD}}
-{{/DASHBOARD_PORT}}
+{{/DASHBOARD_INTERNAL_PORT}}
 
 [program:syslogd]
 priority=1
@@ -29,27 +29,14 @@ stdout_events_enabled = true
 stderr_events_enabled = true
 command=haproxy -f /etc/haproxy/haproxy.cfg
 
-[program:shadowsocksr]
+{{SSL_DOMAIN}}
+[program:caddy]
 stdout_events_enabled = true
 stderr_events_enabled = true
-directory=/opt/shadowsocksr
-command=python server.py
+command=caddy -agree -conf /etc/Caddyfile -disable-tls-sni-challenge -https-port {{CADDY_INTERNAL_PORT}} -log stdout
 
-{{#V2RAY_HTTP_WEBSOCKET_DOMAIN}}
-[program:nginx]
-stdout_events_enabled = true
-stderr_events_enabled = true
-command=nginx -g "daemon off;"
-
-[program:v2ray-websocket]
+[program:v2ray]
 stdout_events_enabled = true
 stderr_events_enabled = true
 command=v2ray -config /etc/v2ray/config.websocket.json
-{{/V2RAY_HTTP_WEBSOCKET_DOMAIN}}
-
-{{#OCSERV_DOMAIN}}
-[program:ocserv]
-stdout_events_enabled = true
-stderr_events_enabled = true
-command=ocserv -c /etc/ocserv/ocserv.conf -f -d 1
-{{/OCSERV_DOMAIN}}
+{{/SSL_DOMAIN}}

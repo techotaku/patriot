@@ -2,15 +2,8 @@
 
 export PYTHONUNBUFFERED=1
 
-if [ -z "$PUBLIC_IP" ]; then
-    export PUBLIC_IP=`curl -s https://ipconfig.io`
-fi
-echo "[Info] Public IP ${PUBLIC_IP} detected."
-
-mkdir -p /etc/patriot/ca
-mkdir -p /etc/patriot/ssl
-mkdir -p /etc/patriot/nginx
-mkdir -p /run/nginx
+export GATEWAY_IP=`/sbin/ip route|awk '/default/ { print $3 }'`
+echo "[Info] Gateway IP ${GATEWAY_IP} detected."
 
 IP_FORWARD_ENABLE=`sysctl -n net.ipv4.ip_forward`
 if [ "$IP_FORWARD_ENABLE" -eq "0" ]; then
@@ -22,8 +15,8 @@ else
 fi
 
 # Enable NAT forwarding
-iptables -t nat -A POSTROUTING -j MASQUERADE || echo "No permission to operate iptables."
-iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || echo "Run container with option \"--cap-add=NET_ADMIN\"."
+iptables -t nat -A POSTROUTING -j MASQUERADE || echo "[Error] No permission to operate iptables."
+iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || echo "        Run container with option \"--cap-add=NET_ADMIN\"."
 
 # Enable TUN device
 if [ ! -e /dev/net/tun ]; then
@@ -34,83 +27,19 @@ fi
 
 # Internal ports
 
-export NGINX_HTTPS_INTERNAL_PORT=20443
-export V2RAY_HTTP_INTERNAL_PORT=23080
-export SSR_INTERNAL_PORT=24443
+export CADDY_INTERNAL_PORT=20443
+export V2RAY_HTTP_INTERNAL_PORT=20080
 export OCSERV_INTERNAL_PORT=22443
 
-# Certs
+# Caddy
 
-if [ ! -f "/etc/patriot/ssl/dh2048.pem" ]; then
-    openssl dhparam -out /etc/patriot/ssl/dh2048.pem 2048
-fi
+mkdir -p /etc/patriot/caddy
+mkdir -p /root/webroot
 
-if [ -z "$V2RAY_WEBSOCKET_CERT" ]; then
-    export V2RAY_WEBSOCKET_CERT=/etc/patriot/ssl/v2ray.ws.crt.pem
-fi
+export CADDYPATH=/etc/patriot/caddy
 
-if [ -z "$V2RAY_WEBSOCKET_KEY" ]; then
-    export V2RAY_WEBSOCKET_KEY=/etc/patriot/ssl/v2ray.ws.key.pem
-fi
-
-if [ -z "$V2RAY_WEBSOCKET_CA" ]; then
-    export V2RAY_WEBSOCKET_CA=/etc/patriot/ssl/v2ray.ws.ca.pem
-fi
-
-if [ -z "$OCSERV_CERT" ]; then
-    export OCSERV_CERT=/etc/patriot/ssl/ocserv.crt.pem
-fi
-
-if [ -z "$OCSERV_KEY" ]; then
-    export OCSERV_KEY=/etc/patriot/ssl/ocserv.key.pem
-fi
-
-if [ -z "$OCSERV_CA" ]; then
-    export OCSERV_CA=/etc/patriot/ssl/ocserv.ca.pem
-fi
-
-if [ ! -f "$V2RAY_WEBSOCKET_CERT" ] && [ -f "$V2RAY_WEBSOCKET_KEY" ]; then
-    echo "[Warn] V2Ray WebSocket - Key exists but cert not, will re-generate."
-    rm -f "$V2RAY_WEBSOCKET_KEY" > /dev/null 2>&1
-fi
-
-if [ ! -f "$V2RAY_WEBSOCKET_KEY" ] && [ ! -z "$V2RAY_HTTP_WEBSOCKET_DOMAIN" ]; then
-    rm -f "$V2RAY_WEBSOCKET_CERT" > /dev/null 2>&1
-    rm -f "$V2RAY_WEBSOCKET_KEY" > /dev/null 2>&1
-    gencert.sh "/etc/patriot/ca" "Patriot" "${V2RAY_HTTP_WEBSOCKET_DOMAIN}"
-    ln -s "/etc/patriot/ca/${V2RAY_HTTP_WEBSOCKET_DOMAIN}.crt.pem" "$V2RAY_WEBSOCKET_CERT"
-    ln -s "/etc/patriot/ca/${V2RAY_HTTP_WEBSOCKET_DOMAIN}.key.pem" "$V2RAY_WEBSOCKET_KEY"
-    ln -s "/etc/patriot/ca/ca.crt.pem" "$V2RAY_WEBSOCKET_CA"
-fi
-
-if [ ! -f "$OCSERV_CERT" ] && [ -f "$OCSERV_KEY" ]; then
-    echo "[Warn] OCserv - Key exists but cert not, will re-generate."
-    rm -f "$OCSERV_KEY" > /dev/null 2>&1
-fi
-
-if [ ! -f "$OCSERV_KEY" ] && [ ! -z "$OCSERV_DOMAIN" ]; then
-    rm -f /etc/patriot/ssl/ocserv.crt.pem > /dev/null 2>&1
-    gencert.sh "/etc/patriot/ca" "Patriot" "${OCSERV_DOMAIN}"
-    ln -s "/etc/patriot/ca/${OCSERV_DOMAIN}.crt.pem" "$OCSERV_CERT"
-    ln -s "/etc/patriot/ca/${OCSERV_DOMAIN}.key.pem" "$OCSERV_KEY"
-    if [ ! -f "$OCSERV_CA" ]; then
-        rm -f "$OCSERV_CA" > /dev/null 2>&1
-        ln -s "/etc/patriot/ca/ca.crt.pem" "$OCSERV_CA"
-    fi
-fi
-
-# Nginx
-
-if [ -z "$NGINX_HTTPS_REDIRECT" ]; then
-    export NGINX_HTTPS_REDIRECT=https://www.bing.com
-fi
-
-if [ ! -z "$NGINX_RESOLVER" ] && [ -z "$NGINX_SSL_STAPLING" -a -f "$V2RAY_WEBSOCKET_CA" ]; then
-    export NGINX_SSL_STAPLING=On
-fi
-
-if [ -z "$NGINX_PHPFPM" ]; then
-    export NGINX_PHPFPM=php
+if [ -z "$DEFAULT_REDIRECT" ]; then
+    export DEFAULT_REDIRECT=https://www.bing.com
 fi
 
 # V2Ray
@@ -140,6 +69,31 @@ fi
 
 # OCserv
 
+mkdir -p /etc/patriot/ca
+mkdir -p /etc/patriot/ssl
+
+if [ -z "$OCSERV_CERT" ]; then
+    export OCSERV_CERT=${CADDYPATH}/acme/acme-v01.api.letsencrypt.org/sites/${SSL_DOMAIN}/${SSL_DOMAIN}.crt
+fi
+
+if [ -z "$OCSERV_KEY" ]; then
+    export OCSERV_KEY=${CADDYPATH}/acme/acme-v01.api.letsencrypt.org/sites/${SSL_DOMAIN}/${SSL_DOMAIN}.key
+fi
+
+if [ -z "$OCSERV_CA" ]; then
+    export OCSERV_CA=/etc/patriot/ssl/ocserv.ca.pem
+fi
+
+if [ -f "$OCSERV_CERT" ] && [ -f "$OCSERV_KEY" ]; then
+    export OCSERV_READY="On"
+fi
+
+if [ ! -f "$OCSERV_CA" ]; then
+    rm -f "$OCSERV_CA" > /dev/null 2>&1
+    gencert.sh "/etc/patriot/ca" "Patriot" "${SSL_DOMAIN}"
+    ln -s "/etc/patriot/ca/ca.crt.pem" "$OCSERV_CA"
+fi
+
 if [ -z "$OCSERV_DNS" ]; then
     export OCSERV_DNS=8.8.8.8
 fi
@@ -152,104 +106,30 @@ if [ -z "$OCSERV_NETMASK" ]; then
     export OCSERV_NETMASK=255.255.255.0
 fi
 
-# SSR
+if [ ! -z "$SSL_DOMAIN" ] && [ ! -z "$ACME_EMAIL" ]; then
+    echo ""
+    echo "Updating Caddy configurations..."
+    cat /etc/mo/template/Caddyfile.template | mo > /etc/Caddyfile
+    cat /etc/mo/template/index.html.template | mo > /root/webroot/index.html
 
-if [ ! -z "$PUBLIC_IP" ] && [ -z "$SSR_DB_NODE" ] && [ -f "/etc/patriot/shadowsocksr/nodes/$PUBLIC_IP" ]; then
-    export SSR_DB_NODE=`cat "/etc/patriot/shadowsocksr/nodes/$PUBLIC_IP"`
-    echo "[Info] ShadowsocksR Node ID ${SSR_DB_NODE} automatically detected."
-fi
+    echo "Updating V2Ray configurations..."
+    mkdir -p /etc/v2ray
+    cat /etc/mo/template/config.websocket.json.template | mo > /etc/v2ray/config.websocket.json
 
-if [ -z "$SSR_API_INTERFACE" ]; then
-    export SSR_SINGLE_USER=On
-    export SSR_API_INTERFACE=mudbjson
-fi
+    echo "Updating OCserv configuration..."
+    mkdir -p /etc/ocserv
+    cat /etc/mo/template/ocserv.conf.template | mo > /etc/ocserv/ocserv.conf
 
-if [ -z "$SSR_SINGLE_PORT_PWD" ]; then
-    export SSR_SINGLE_PORT_PWD=atgwwc
-fi
+    echo "Updating HAProxy configuration..."
+    cat /etc/mo/template/haproxy.cfg.template | mo > /etc/haproxy/haproxy.cfg
 
-if [ ! -z "$SSR_SINGLE_USER" ]; then
-    echo "[Info] ShadowsocksR single user mode enabled."
-    if [ -z "$SSR_SINGLE_USER_ID" ]; then
-        export SSR_SINGLE_USER_ID=198709
-    fi
-    if [ -z "$SSR_SINGLE_USER_PWD" ]; then
-        export SSR_SINGLE_USER_PWD=rEciTw
-    fi
-fi
+    echo "Updating Supervisord configuration..."
+    mkdir -p /etc/supervisord
+    cat /etc/mo/template/supervisord.conf.template | mo > /etc/supervisord/supervisord.conf
 
-echo "[Info] ShadowsocksR API interface ${SSR_API_INTERFACE} applied."
-
-if [ -z "$SSR_METHOD" ]; then
-    export SSR_METHOD=none
-fi
-
-if [ -z "$SSR_PROTOCOL" ]; then
-    export SSR_PROTOCOL=auth_chain_a
-fi
-
-if [ -z "$SSR_OBFS" ]; then
-    export SSR_OBFS=tls1.2_ticket_auth
-fi
-
-if [ -z "$SSR_OBFS_DOMAIN" ]; then
-    export SSR_OBFS_DOMAIN=mail.qq.com
-fi
-
-if [ -z "$SSR_DB_PORT" ]; then
-    export SSR_DB_PORT=3306
-fi
-
-if [ -z "$SSR_DB_MUL" ]; then
-    export SSR_DB_MUL=1.0
-fi
-
-if [ -z "$SSR_DB_SSL" ]; then
-    export SSR_DB_SSL=0
-fi
-
-echo ""
-echo "Updating ShadowsocksR configurations..."
-
-rm -f /opt/shadowsocksr/userapiconfig.py > /dev/null 2>&1
-rm -f /opt/shadowsocksr/user-config.json > /dev/null 2>&1
-rm -f /opt/shadowsocksr/usermysql.json > /dev/null 2>&1
-rm -f /opt/shadowsocksr/mudb.json > /dev/null 2>&1
-
-cat /etc/mo/template/userapiconfig.py.template | mo > /opt/shadowsocksr/userapiconfig.py
-cat /etc/mo/template/user-config.json.template | mo > /opt/shadowsocksr/user-config.json
-cat /etc/mo/template/usermysql.json.template | mo > /opt/shadowsocksr/usermysql.json
-
-if [ ! -z "$SSR_SINGLE_USER" ]; then
-    cat /etc/mo/template/mudb.json.template | mo > /opt/shadowsocksr/mudb.json
+    echo "All configurations updated. Starting services..."
+    exec supervisord --nodaemon --configuration /etc/supervisord/supervisord.conf "$@"
 else
-    if [ -f "$SSR_MUDB_FILE" ]; then
-        ln -s "$SSR_MUDB_FILE" /opt/shadowsocksr/mudb.json
-    fi
+    echo ""
+    echo "[Error] Environment variables \"SSL_DOMAIN\" and \"ACME_EMAIL\" are required."
 fi
-
-echo "Updating Nginx configurations..."
-cat /etc/mo/template/default.conf.template | mo > /etc/nginx/conf.d/default.conf
-cat /etc/mo/template/nginx.listen-ssl.template | mo > /etc/nginx/conf.d/listen-ssl
-cat /etc/mo/template/nginx.php-param.template | mo > /etc/nginx/conf.d/php-param
-cat /etc/mo/template/nginx.ssl-param.template | mo > /etc/nginx/conf.d/ssl-param
-cat /etc/mo/template/nginx.ssl-param-with-shared-ca.template | mo > /etc/nginx/conf.d/ssl-param-with-shared-ca
-cat /etc/mo/template/nginx.v2ray-websocket-param.template | mo > /etc/nginx/conf.d/v2ray-websocket-param
-
-echo "Updating V2Ray configurations..."
-mkdir -p /etc/v2ray
-cat /etc/mo/template/config.websocket.json.template | mo > /etc/v2ray/config.websocket.json
-
-echo "Updating OCserv configuration..."
-mkdir -p /etc/ocserv
-cat /etc/mo/template/ocserv.conf.template | mo > /etc/ocserv/ocserv.conf
-
-echo "Updating HAProxy configuration..."
-cat /etc/mo/template/haproxy.cfg.template | mo > /etc/haproxy/haproxy.cfg
-
-echo "Updating Supervisord configuration..."
-mkdir -p /etc/supervisord
-cat /etc/mo/template/supervisord.conf.template | mo > /etc/supervisord/supervisord.conf
-
-echo "All configurations updated. Starting services..."
-exec supervisord --nodaemon --configuration /etc/supervisord/supervisord.conf "$@"

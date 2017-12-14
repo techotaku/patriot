@@ -1,4 +1,0 @@
-        include /etc/nginx/conf.d/ssl-param;
-        {{#NGINX_SSL_STAPLING}}
-        ssl_trusted_certificate {{V2RAY_WEBSOCKET_CA}};
-        {{/NGINX_SSL_STAPLING}}
