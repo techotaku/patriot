@@ -11,12 +11,12 @@ buffer_size = 100
 events = PROCESS_LOG
 result_handler = supervisor_stdout:event_handler
 
-{{#DASHBOARD_INTERNAL_PORT}}
+{{#DASHBOARD_PORT}}
 [inet_http_server]
-port=0.0.0.0:{{DASHBOARD_INTERNAL_PORT}}
+port=0.0.0.0:{{DASHBOARD_PORT}}
 username={{DASHBOARD_USER}}
 password={{DASHBOARD_PWD}}
-{{/DASHBOARD_INTERNAL_PORT}}
+{{/DASHBOARD_PORT}}
 
 [program:syslogd]
 priority=1
