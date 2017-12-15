@@ -31,6 +31,13 @@ export CADDY_INTERNAL_PORT=20443
 export V2RAY_HTTP_INTERNAL_PORT=20080
 export OCSERV_INTERNAL_PORT=21443
 
+# HAProxy
+
+if [ ! -z "$DEFAULT_BACKEND" ]; then
+    export DEFAULT_BACKEND=`echo $DEFAULT_BACKEND | mo`
+    echo "[Info] HAProxy SSL frontend's default backend detected: \"${DEFAULT_BACKEND}\"."
+fi
+
 # Caddy
 
 mkdir -p /etc/patriot/caddy
@@ -38,8 +45,8 @@ mkdir -p /root/webroot
 
 export CADDYPATH=/etc/patriot/caddy
 
-if [ -z "$DEFAULT_REDIRECT" ]; then
-    export DEFAULT_REDIRECT=https://www.bing.com
+if [ -z "$V2RAY_HTTP_DEFAULT_PROXY" ]; then
+    export V2RAY_HTTP_DEFAULT_PROXY=https://www.bing.com
 fi
 
 # V2Ray

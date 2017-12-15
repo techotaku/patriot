@@ -15,6 +15,13 @@ sudo docker run -d --name patriot \
     tarot13/patriot
 ```
 
+## Useful Env Vars    
+* **SSL_DOMAIN**: *Required.*    
+* **ACME_EMAIL**: *Required.*    
+* **V2RAY_HTTP_WEBSOCKET_PATH**: *Optional.* V2Ray websocket path. Use root path by default.    
+* **V2RAY_HTTP_DEFAULT_PROXY**: *Optional.* Default proxy target for root path. Take effect only when *V2RAY_HTTP_WEBSOCKET_PATH* is set.    
+* **DEFAULT_BACKEND**: *Optional.* Default backend for port 443, such as `{{GATEWAY_IP}}:4443  send-proxy` (template syntax is allowed). Use Caddy by default.    
+
 ## V2Ray    
 Put your V2Ray clients into `$HOME/patriot/v2ray/clients.json`, or **one** new UUID will be generated at first startup.    
 ```

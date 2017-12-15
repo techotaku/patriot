@@ -1,7 +1,4 @@
 https://{{SSL_DOMAIN}} {
-    errors stderr {
-        404 index.html
-    }
     gzip
     proxyprotocol 0.0.0.0/0
     tls {{ACME_EMAIL}}
@@ -9,4 +6,11 @@ https://{{SSL_DOMAIN}} {
         websocket
         transparent
     }
+{{#V2RAY_HTTP_WEBSOCKET_PATH}}
+    proxy / {{V2RAY_HTTP_DEFAULT_PROXY}} {
+        header_upstream X-Real-IP {remote}
+        header_upstream X-Forwarded-For {remote}
+        header_upstream X-Forwarded-Proto {scheme}
+    }
+{{/V2RAY_HTTP_WEBSOCKET_PATH}}
 }

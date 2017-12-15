@@ -24,10 +24,15 @@ frontend ssl
 {{#OCSERV_READY}}
     use_backend ocserv if tls !has_sni
 {{/OCSERV_READY}}
-    use_backend caddy if tls has_sni
+    use_backend caddy if tls { req.ssl_sni -i {{SSL_DOMAIN}} }
     use_backend openssh if ssh_payload
     use_backend openssh if !tls { req.len 0 }
+{{^DEFAULT_BACKEND}}
     default_backend caddy
+{{/DEFAULT_BACKEND}}
+{{#DEFAULT_BACKEND}}
+    default_backend user
+{{/DEFAULT_BACKEND}}
 
 backend openssh
     mode tcp
@@ -38,6 +43,13 @@ backend caddy
     mode tcp
     timeout server 5m
     server webserver localhost:{{CADDY_INTERNAL_PORT}} send-proxy
+
+{{#DEFAULT_BACKEND}}
+backend user
+    mode tcp
+    timeout server 5m
+    server webserver {{DEFAULT_BACKEND}}
+{{/DEFAULT_BACKEND}}
 
 {{#OCSERV_READY}}
 backend ocserv
