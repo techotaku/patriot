@@ -1,8 +1,8 @@
-FROM alpine:edge
+FROM alpine
 
 LABEL maintainer "Ian Li <OpenSource@ianli.xyz>"
 
-ARG V2RAY_VER=3.4
+ARG V2RAY_VER=3.5
 ARG OC_VERSION=0.11.9
 
 RUN apk add --no-cache bash curl nano ca-certificates bind-tools python py-pip haproxy gnutls gnutls-utils && \
