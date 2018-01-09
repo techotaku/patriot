@@ -4,6 +4,13 @@
     "error": "/dev/stderr",
     "loglevel": "warning"
   },
+{{#V2RAY_DNS}}
+  "dns": {
+    "servers": [
+      "{{V2RAY_DNS}}"
+    ]
+  },
+{{/V2RAY_DNS}}
   "inbound": {
     "port": {{V2RAY_HTTP_INTERNAL_PORT}},
     "protocol": "vmess",
@@ -27,6 +34,13 @@
   },
   "outbound": {
     "protocol": "freedom",
+{{^V2RAY_DNS}}
     "settings": {}
+{{/V2RAY_DNS}}
+{{#V2RAY_DNS}}
+{{/V2RAY_DNS}}
+    "settings": { 
+      "domainStrategy": "UseIP"
+    }
   }
 }
