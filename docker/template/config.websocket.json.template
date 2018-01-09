@@ -38,9 +38,9 @@
     "settings": {}
 {{/V2RAY_DNS}}
 {{#V2RAY_DNS}}
-{{/V2RAY_DNS}}
     "settings": { 
       "domainStrategy": "UseIP"
     }
+{{/V2RAY_DNS}}
   }
 }
