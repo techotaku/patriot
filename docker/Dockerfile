@@ -2,8 +2,8 @@ FROM alpine
 
 LABEL maintainer "Ian Li <OpenSource@ianli.xyz>"
 
-ARG V2RAY_VER=3.5
-ARG OC_VERSION=0.11.9
+ARG V2RAY_VER=3.6
+ARG OC_VERSION=0.11.10
 
 RUN apk add --no-cache bash curl nano ca-certificates bind-tools python py-pip haproxy gnutls gnutls-utils && \
     apk add --no-cache --virtual .ocserv-runtime-dependencies iptables musl openssl readline libnl3 lz4 lz4-libs libseccomp libev geoip && \
