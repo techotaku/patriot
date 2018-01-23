@@ -8,7 +8,7 @@ echo "[Info] Gateway IP ${GATEWAY_IP} detected."
 IP_FORWARD_ENABLE=`sysctl -n net.ipv4.ip_forward`
 if [ "$IP_FORWARD_ENABLE" -eq "0" ]; then
     echo "[Error] IP forward disabled. On host, execute below commands:"
-    echo "        echo \"net.core.default_qdisc = fq\" | sudo tee -a /etc/sysctl.conf"
+    echo "        echo \"net.ipv4.ip_forward = 1\" | sudo tee -a /etc/sysctl.conf"
     echo "        sysctl -p"
 else
     echo "[Info] IP forward enabled."
